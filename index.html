@@ -1,92 +1,24 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#141313" />
-  <meta name="description" content="ASHQD — визуальная библиотека одежды и образов для ролевых историй." />
-  <title>ASHQD — wardrobe archive</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#111110">
+<meta name="description" content="ASHQD — визуальный архив одежды и образов для ролевых историй.">
+<title>ASHQD — Wardrobe Archive</title><link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="grain"></div>
-  <header class="topbar">
-    <a class="brand" href="#top" aria-label="ASHQD home">ASHQD<span class="brand-dot">.</span></a>
-    <nav class="main-nav" aria-label="Основная навигация">
-      <a class="nav-link active" href="#catalog">КАТАЛОГ</a>
-      <a class="nav-link" href="#about">О ПРОЕКТЕ</a>
-    </nav>
-    <button class="upload-top" id="openCreate"><span>＋</span> ДОБАВИТЬ ОБРАЗ</button>
-  </header>
-
-  <main id="top">
-    <section class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="pulse"></span> PERSONAL WARDROBE ARCHIVE / VOL. 01</p>
-        <h1>Dress the<br><em>character.</em></h1>
-        <p class="hero-sub">Визуальная библиотека одежды для твоих историй.<br>Сохраняй детали. Собирай образы. Создавай атмосферу.</p>
-        <a class="hero-cta" href="#catalog">ИССЛЕДОВАТЬ АРХИВ <span>↘</span></a>
-      </div>
-      <div class="hero-art" aria-label="Коллаж одежды">
-        <div class="hero-stamp">ASHQD<br><small>EST. 2026</small></div>
-        <div class="hero-photo photo-one"><img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=900&q=85" alt="Модный образ в тёмном пальто"></div>
-        <div class="hero-photo photo-two"><img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=700&q=85" alt="Детали городского образа"></div>
-        <div class="hero-note">FIG. 001<br><span>THE SILHOUETTE</span></div>
-        <div class="hero-cross">✳</div>
-      </div>
-      <div class="hero-index"><span>01 / 04</span><span>WARDROBE STUDIES</span><span>SCROLL TO EXPLORE ↓</span></div>
-    </section>
-
-    <section class="catalog-section" id="catalog">
-      <div class="section-head">
-        <div><p class="eyebrow">THE COLLECTION</p><h2>Архив <span>образов.</span></h2></div>
-        <p class="section-description">Одежда, аксессуары и готовые сочетания —<br>собранные в одном месте.</p>
-      </div>
-      <div class="toolbar">
-        <label class="search-wrap"><span>⌕</span><input id="searchInput" type="search" placeholder="Найти образ, вещь или тег..." autocomplete="off"><kbd>↵</kbd></label>
-        <div class="sort-wrap"><span>СОРТИРОВКА</span><select id="sortSelect" aria-label="Сортировка"><option value="new">Сначала новые</option><option value="az">По названию А—Я</option><option value="za">По названию Я—А</option></select></div>
-      </div>
-      <div class="filter-row" id="filters">
-        <button class="filter active" data-filter="Все">ВСЁ <b>06</b></button>
-        <button class="filter" data-filter="Верхняя одежда">ВЕРХНЯЯ ОДЕЖДА</button>
-        <button class="filter" data-filter="Повседневное">ПОВСЕДНЕВНОЕ</button>
-        <button class="filter" data-filter="Формальное">ФОРМАЛЬНОЕ</button>
-        <button class="filter" data-filter="Аксессуары">АКСЕССУАРЫ</button>
-        <button class="filter" data-filter="Фэнтези">ФЭНТЕЗИ</button>
-      </div>
-      <div class="results-line"><span id="resultsCount">06 ОБРАЗОВ</span><span>CURATED FOR ROLEPLAY</span></div>
-      <div class="grid" id="outfitGrid"></div>
-      <div class="empty-state hidden" id="emptyState"><span>✳</span><h3>Ничего не нашлось</h3><p>Попробуй изменить запрос или выбрать другую категорию.</p><button id="resetSearch">СБРОСИТЬ ФИЛЬТРЫ</button></div>
-    </section>
-
-    <section class="manifesto" id="about">
-      <div class="manifesto-mark">A<span>.</span></div>
-      <div><p class="eyebrow">A SMALL MANIFESTO</p><h2>Every detail<br>tells a <em>story.</em></h2></div>
-      <p class="manifesto-text">ASHQD — твой личный архив визуальных референсов. Здесь одежда становится частью персонажа: фактура, силуэт, украшения и маленькие детали, которые помогают оживить сцену.</p>
-    </section>
-  </main>
-
-  <footer><a class="brand" href="#top">ASHQD<span class="brand-dot">.</span></a><span>AN ARCHIVE FOR IMAGINED WORLDS</span><span>© 2026</span></footer>
-
-  <div class="modal-backdrop hidden" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
-    <div class="detail-modal"><button class="close-modal" data-close="detailModal" aria-label="Закрыть">×</button><div class="detail-image"><img id="detailImage" alt=""></div><div class="detail-content"><p class="eyebrow" id="detailCategory">CATEGORY</p><h2 id="detailTitle"></h2><p class="detail-description" id="detailDescription"></p><div class="detail-tags" id="detailTags"></div><div class="detail-items"><p class="eyebrow">КОМПЛЕКТАЦИЯ</p><ul id="detailItems"></ul></div><div class="detail-actions"><button class="primary-button" id="copyDescription">КОПИРОВАТЬ ОПИСАНИЕ ↗</button><button class="text-button" id="deleteOutfit">УДАЛИТЬ ОБРАЗ</button></div></div></div>
-  </div>
-
-  <div class="modal-backdrop hidden" id="createModal" role="dialog" aria-modal="true" aria-labelledby="createTitle">
-    <form class="create-modal" id="createForm"><button type="button" class="close-modal" data-close="createModal" aria-label="Закрыть">×</button><p class="eyebrow">ADD TO THE ARCHIVE</p><h2 id="createTitle">Новый <em>образ.</em></h2>
-      <label>НАЗВАНИЕ ОБРАЗА<input name="title" required maxlength="70" placeholder="Например, Midnight commuter"></label>
-      <label>ССЫЛКА НА ИЗОБРАЖЕНИЕ<input name="image" type="url" required placeholder="https://..."></label>
-      <label>КАТЕГОРИЯ<select name="category"><option>Повседневное</option><option>Верхняя одежда</option><option>Формальное</option><option>Аксессуары</option><option>Фэнтези</option></select></label>
-      <label>ОПИСАНИЕ ДЛЯ RP<textarea name="description" required rows="4" placeholder="Опиши силуэт, ткань, посадку и детали..."></textarea></label>
-      <label>СОСТАВ ОБРАЗА <small>(каждая вещь с новой строки)</small><textarea name="items" rows="4" placeholder="Чёрное шерстяное пальто\nТонкий свитер с высоким воротом\nКожаные перчатки"></textarea></label>
-      <label>ТЕГИ <small>(через запятую)</small><input name="tags" placeholder="black, minimal, city"></label>
-      <button class="primary-button submit-button" type="submit">СОХРАНИТЬ В АРХИВ ↗</button><p class="form-hint">Пока данные хранятся в этом браузере на твоём устройстве.</p>
-    </form>
-  </div>
-  <div class="toast" id="toast" role="status"></div>
-  <script src="app.js"></script>
-</body>
-</html>
+<div class="grain"></div>
+<header class="topbar"><a class="brand" href="#top">ASHQD<span class="brand-dot">.</span></a><nav class="main-nav"><a class="nav-link active" href="#catalog">КАТАЛОГ</a><a class="nav-link" href="#about">О ПРОЕКТЕ</a></nav><button class="upload-top" id="openCreate"><span>＋</span> ДОБАВИТЬ ОБРАЗ</button></header>
+<main id="top">
+<section class="hero"><div class="hero-copy"><p class="eyebrow"><span class="pulse"></span> PERSONAL WARDROBE ARCHIVE / VOL. 01</p><h1>Dress the<br><em>character.</em></h1><p class="hero-sub">Визуальная библиотека одежды для твоих историй.<br>Сохраняй детали. Собирай образы. Создавай атмосферу.</p><a class="hero-cta" href="#catalog">ИССЛЕДОВАТЬ АРХИВ <span>↘</span></a></div>
+<div class="hero-art"><div class="hero-stamp">ASHQD<br><small>EST. 2026</small></div><div class="hero-photo photo-one"><img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=900&q=85" alt="Fashion editorial"></div><div class="hero-photo photo-two"><img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=700&q=85" alt="Streetwear editorial"></div><div class="hero-note">FIG. 001<br><span>THE SILHOUETTE</span></div><div class="hero-cross">✳</div></div><div class="hero-index"><span>01 / 04</span><span>WARDROBE STUDIES</span><span>SCROLL TO EXPLORE ↓</span></div></section>
+<section class="catalog-section" id="catalog"><div class="section-head"><div><p class="eyebrow">THE COLLECTION</p><h2>Архив <span>образов.</span></h2></div><p class="section-description">Одежда, аксессуары и готовые сочетания —<br>собранные в одном месте.</p></div>
+<div class="toolbar"><label class="search-wrap"><span>⌕</span><input id="searchInput" type="search" placeholder="Найти образ, вещь или тег..." autocomplete="off"><kbd>↵</kbd></label><div class="sort-wrap"><span>СОРТИРОВКА</span><select id="sortSelect"><option value="new">Сначала новые</option><option value="az">По названию А—Я</option><option value="za">По названию Я—А</option></select></div></div>
+<div class="filter-row" id="filters"><button class="filter active" data-filter="Все">ВСЁ <b>06</b></button><button class="filter" data-filter="Верхняя одежда">ВЕРХНЯЯ ОДЕЖДА</button><button class="filter" data-filter="Повседневное">ПОВСЕДНЕВНОЕ</button><button class="filter" data-filter="Формальное">ФОРМАЛЬНОЕ</button><button class="filter" data-filter="Аксессуары">АКСЕССУАРЫ</button><button class="filter" data-filter="Фэнтези">ФЭНТЕЗИ</button></div>
+<div class="results-line"><span id="resultsCount">06 ОБРАЗОВ</span><span>CURATED FOR ROLEPLAY</span></div><div class="grid" id="outfitGrid"></div><div class="empty-state hidden" id="emptyState"><span>✳</span><h3>Ничего не нашлось</h3><p>Попробуй изменить запрос или выбрать другую категорию.</p><button id="resetSearch">СБРОСИТЬ ФИЛЬТРЫ</button></div></section>
+<section class="manifesto" id="about"><div class="manifesto-mark">A<span>.</span></div><div><p class="eyebrow">A SMALL MANIFESTO</p><h2>Every detail<br>tells a <em>story.</em></h2></div><p class="manifesto-text">ASHQD — твой личный архив визуальных референсов. Здесь одежда становится частью персонажа: фактура, силуэт, украшения и маленькие детали, которые помогают оживить сцену.</p></section></main>
+<footer><a class="brand" href="#top">ASHQD<span class="brand-dot">.</span></a><span>AN ARCHIVE FOR IMAGINED WORLDS</span><span>© 2026</span></footer>
+<div class="modal-backdrop hidden" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle"><div class="detail-modal"><button class="close-modal" data-close="detailModal" aria-label="Закрыть">×</button><div class="detail-image"><img id="detailImage" alt=""></div><div class="detail-content"><p class="eyebrow" id="detailCategory">CATEGORY</p><h2 id="detailTitle"></h2><p class="detail-description" id="detailDescription"></p><div class="detail-tags" id="detailTags"></div><div class="detail-items"><p class="eyebrow">КОМПЛЕКТАЦИЯ</p><ul id="detailItems"></ul></div><div class="detail-actions"><button class="primary-button" id="copyDescription">КОПИРОВАТЬ ОПИСАНИЕ ↗</button><button class="text-button" id="deleteOutfit">УДАЛИТЬ ОБРАЗ</button></div></div></div></div>
+<div class="modal-backdrop hidden" id="createModal" role="dialog" aria-modal="true" aria-labelledby="createTitle"><form class="create-modal" id="createForm"><button type="button" class="close-modal" data-close="createModal" aria-label="Закрыть">×</button><p class="eyebrow">ADD TO THE ARCHIVE</p><h2 id="createTitle">Новый <em>образ.</em></h2>
+<label>НАЗВАНИЕ ОБРАЗА<input name="title" required maxlength="70" placeholder="Например, Midnight commuter"></label><label>ССЫЛКА НА ИЗОБРАЖЕНИЕ<input name="image" type="url" required placeholder="https://..."></label><label>КАТЕГОРИЯ<select name="category"><option>Повседневное</option><option>Верхняя одежда</option><option>Формальное</option><option>Аксессуары</option><option>Фэнтези</option></select></label><label>ОПИСАНИЕ ДЛЯ RP<textarea name="description" required rows="4" placeholder="Опиши силуэт, ткань, посадку и детали..."></textarea></label><label>СОСТАВ ОБРАЗА <small>(каждая вещь с новой строки)</small><textarea name="items" rows="4" placeholder="Чёрное шерстяное пальто&#10;Тонкий свитер с высоким воротом&#10;Кожаные перчатки"></textarea></label><label>ТЕГИ <small>(через запятую)</small><input name="tags" placeholder="black, minimal, city"></label><button class="primary-button submit-button" type="submit">СОХРАНИТЬ В АРХИВ ↗</button><p class="form-hint">Пользовательские записи сохраняются в браузере на этом устройстве.</p></form></div>
+<div class="toast" id="toast" role="status"></div><script src="app.js"></script>
+</body></html>
