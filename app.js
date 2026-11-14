@@ -1,38 +1,101 @@
-const starter=[
-{id:'01',title:'Midnight silhouette',category:'Верхняя одежда',image:'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=1000&q=85',description:'Объёмное тёмное пальто с чёткой линией плеч и удлинённым силуэтом. Плотная матовая ткань мягко держит форму, а широкий лацкан создаёт выразительную вертикаль. Под ним — лаконичный монохромный слой.',items:['Длинное пальто свободного кроя','Чёрный тонкий джемпер','Прямые брюки со стрелками','Кожаная сумка на короткой ручке'],tags:['darkwear','minimal','city'],date:6},
-{id:'02',title:'Soft contrast',category:'Повседневное',image:'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1000&q=85',description:'Расслабленный городской комплект на контрасте мягких и структурных фактур. Верх свободно лежит по фигуре, не сковывая движений; отдельные аксессуары собирают силуэт в цельный образ.',items:['Свободная куртка','Базовый топ нейтрального оттенка','Широкие брюки','Минималистичные украшения'],tags:['casual','layering','neutral'],date:5},
-{id:'03',title:'Quiet luxury',category:'Формальное',image:'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1000&q=85',description:'Сдержанный элегантный образ с акцентом на точную посадку и качество материалов. Чистые линии, спокойная палитра и минимум декора делают комплект уместным для официальной сцены.',items:['Структурированный жакет','Рубашка из гладкого хлопка','Брюки прямого кроя','Тонкий ремень'],tags:['formal','classic','tailoring'],date:4},
-{id:'04',title:'After hours',category:'Повседневное',image:'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?auto=format&fit=crop&w=1000&q=85',description:'Небрежный, но продуманный образ для позднего вечера. Мягкие слои, расслабленная посадка и слегка состаренные фактуры добавляют персонажу естественности.',items:['Кожаная куртка','Футболка свободного кроя','Тёмные джинсы','Массивные ботинки'],tags:['streetwear','night','layers'],date:3},
-{id:'05',title:'Silver details',category:'Аксессуары',image:'https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1000&q=85',description:'Акцент на холодном металлическом блеске и небольших деталях. Украшения не перегружают образ, а ловят свет при движении и добавляют характер даже самой простой одежде.',items:['Серебряная цепочка','Кольца разной ширины','Минималистичные серьги','Тонкий браслет'],tags:['silver','jewelry','details'],date:2},
-{id:'06',title:'The wanderer',category:'Фэнтези',image:'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1000&q=85',description:'Образ странника с многослойной конструкцией и слегка винтажным настроением. Плотная ткань, высокий ворот и ремни создают практичный силуэт, будто собранный для долгой дороги.',items:['Плащ с высоким воротом','Тёмная туника','Широкий кожаный пояс','Высокие сапоги'],tags:['fantasy','wanderer','vintage'],date:1}
-];
-const STORE='ashqd-outfits-v2',FAV='ashqd-favorites-v1';
-let custom=JSON.parse(localStorage.getItem(STORE)||'[]'),favorites=new Set(JSON.parse(localStorage.getItem(FAV)||'[]')),activeFilter='Все',activeItem=null;
-const all=()=>[...custom,...starter];
+const DB_NAME="ashqd-character-archive";
+const DB_VERSION=1;
+let db=null;
+let currentCharacterId=null;
+let activePhoto=null;
+let previewUrl=null;
+let fullImageUrl=null;
 const $=s=>document.querySelector(s);
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const save=()=>localStorage.setItem(STORE,JSON.stringify(custom));
-function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2300)}
-function render(){
- const query=$('#searchInput').value.trim().toLowerCase(),sort=$('#sortSelect').value;
- let data=all().filter(x=>(activeFilter==='Все'||x.category===activeFilter)&&[x.title,x.description,x.category,...(x.tags||[]),...(x.items||[])].join(' ').toLowerCase().includes(query));
- if(sort==='az')data.sort((a,b)=>a.title.localeCompare(b.title,'ru'));if(sort==='za')data.sort((a,b)=>b.title.localeCompare(a.title,'ru'));if(sort==='new')data.sort((a,b)=>(b.date||0)-(a.date||0));
- $('#outfitGrid').innerHTML=data.map((x,i)=>`<article class="card" data-open="${esc(x.id)}" style="animation-delay:${i*45}ms"><div class="card-image"><img src="${esc(x.image)}" alt="${esc(x.title)}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80'"><span class="card-number">№ ${esc(x.id)}</span><span class="card-category">${esc(x.category.toUpperCase())}</span><button class="favorite ${favorites.has(x.id)?'saved':''}" data-fav="${esc(x.id)}" aria-label="В избранное">${favorites.has(x.id)?'♥':'♡'}</button></div><div class="card-meta"><div><h3 class="card-title">${esc(x.title)}</h3><p class="card-description">${esc(x.description)}</p></div><span class="card-index">0${i+1}</span></div><div class="card-bottom"><div class="card-tags">${(x.tags||[]).slice(0,3).map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div><span class="view-link">СМОТРЕТЬ ↗</span></div></article>`).join('');
- $('#resultsCount').textContent=String(data.length).padStart(2,'0')+' ОБРАЗОВ';$('#emptyState').classList.toggle('hidden',data.length>0);$('#outfitGrid').classList.toggle('hidden',data.length===0);
- const total=String(all().length).padStart(2,'0');document.querySelector('[data-filter="Все"] b').textContent=total;
+const esc=value=>String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const makeId=()=> "id-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);
+function toast(message){const el=$("#toast");el.textContent=message;el.classList.add("show");clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.remove("show"),2600)}
+function openDB(){return new Promise((resolve,reject)=>{const request=indexedDB.open(DB_NAME,DB_VERSION);request.onupgradeneeded=()=>{const database=request.result;if(!database.objectStoreNames.contains("characters"))database.createObjectStore("characters",{keyPath:"id"});if(!database.objectStoreNames.contains("photos")){const store=database.createObjectStore("photos",{keyPath:"id"});store.createIndex("characterId","characterId",{unique:false})}};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error)})}
+function requestStore(name,mode,action){return new Promise((resolve,reject)=>{const tx=db.transaction(name,mode);const store=tx.objectStore(name);const req=action(store);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)})}
+const getAll=name=>requestStore(name,"readonly",s=>s.getAll());
+const getOne=(name,id)=>requestStore(name,"readonly",s=>s.get(id));
+const put=(name,value)=>requestStore(name,"readwrite",s=>s.put(value));
+const remove=(name,id)=>requestStore(name,"readwrite",s=>s.delete(id));
+function showModal(id){$("#"+id).classList.remove("hidden");document.body.classList.add("modal-open")}
+function closeModal(id){$("#"+id).classList.add("hidden");if(!document.querySelector(".modal-backdrop:not(.hidden)"))document.body.classList.remove("modal-open");if(id==="photoModal")clearPreview();if(id==="imageModal"&&fullImageUrl){URL.revokeObjectURL(fullImageUrl);fullImageUrl=null}}
+function clearPreview(){if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null}$("#previewImage").removeAttribute("src");$("#imagePreview").classList.add("hidden");$("#photoFile").value=""}
+function filePreview(file){if(!file||!file.type.startsWith("image/"))return;if(previewUrl)URL.revokeObjectURL(previewUrl);previewUrl=URL.createObjectURL(file);$("#previewImage").src=previewUrl;$("#imagePreview").classList.remove("hidden")}
+function compressImage(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onerror=()=>reject(reader.error);reader.onload=()=>{const img=new Image();img.onerror=()=>reject(new Error("Не удалось открыть изображение"));img.onload=()=>{const limit=1800,ratio=Math.min(1,limit/Math.max(img.width,img.height));const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*ratio));canvas.height=Math.max(1,Math.round(img.height*ratio));const ctx=canvas.getContext("2d");ctx.drawImage(img,0,0,canvas.width,canvas.height);canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("Не удалось обработать изображение")),"image/webp",.88)};img.src=reader.result};reader.readAsDataURL(file)})}
+function showHome(){currentCharacterId=null;$("#homeView").classList.remove("hidden");$("#characterView").classList.add("hidden");window.scrollTo({top:0,behavior:"smooth"});renderCharacters()}
+function setBranchView(){ $("#homeView").classList.add("hidden");$("#characterView").classList.remove("hidden");window.scrollTo({top:0,behavior:"smooth"})}
+async function renderCharacters(){
+ const [characters,photos]=await Promise.all([getAll("characters"),getAll("photos")]);
+ characters.sort((a,b)=>b.createdAt-a.createdAt);
+ const query=$("#searchInput").value.trim().toLowerCase();
+ const filtered=characters.filter(c=>[c.name,c.bio,...(c.tags||[])].join(" ").toLowerCase().includes(query));
+ $("#characterCount").textContent=String(characters.length).padStart(2,"0");
+ $("#characterGrid").innerHTML=filtered.map((c,index)=>{const count=photos.filter(p=>p.characterId===c.id).length;return '<article class="branch-card" data-character="'+esc(c.id)+'" style="animation-delay:'+(index*45)+'ms"><div class="branch-top"><span>FILE / '+String(index+1).padStart(3,"0")+'</span><span class="branch-icon">✧</span></div><h3 class="branch-name">'+esc(c.name)+'</h3><p class="branch-bio">'+esc(c.bio||"Персональная ветка персонажа. Нажми, чтобы открыть архив.")+'</p><div class="branch-tags">'+(c.tags||[]).slice(0,4).map(t=>"<span>#"+esc(t)+"</span>").join("")+'</div><div class="branch-footer"><span class="branch-meta">'+String(count).padStart(2,"0")+' IMAGE FILES</span><span class="branch-open">OPEN FILE <b>↗</b></span></div></article>'}).join("");
+ $("#emptyState").classList.toggle("hidden",filtered.length>0);
+ $("#characterGrid").classList.toggle("hidden",filtered.length===0);
 }
-function openModal(id){const x=all().find(o=>o.id===id);if(!x)return;activeItem=x;$('#detailImage').src=x.image;$('#detailImage').alt=x.title;$('#detailTitle').textContent=x.title;$('#detailCategory').textContent=x.category.toUpperCase();$('#detailDescription').textContent=x.description;$('#detailTags').innerHTML=(x.tags||[]).map(t=>`<span class="tag">#${esc(t)}</span>`).join('');$('#detailItems').innerHTML=(x.items||[]).map(t=>`<li>${esc(t)}</li>`).join('')||'<li>Состав не указан</li>';$('#deleteOutfit').classList.toggle('hidden',!custom.some(o=>o.id===id));showModal('detailModal')}
-function showModal(id){$('#'+id).classList.remove('hidden');document.body.classList.add('modal-open')}
-function closeModal(id){$('#'+id).classList.add('hidden');if(!document.querySelector('.modal-backdrop:not(.hidden)'))document.body.classList.remove('modal-open')}
-$('#filters').addEventListener('click',e=>{const b=e.target.closest('[data-filter]');if(!b)return;activeFilter=b.dataset.filter;document.querySelectorAll('.filter').forEach(x=>x.classList.toggle('active',x===b));render()});
-$('#outfitGrid').addEventListener('click',e=>{const fav=e.target.closest('[data-fav]');if(fav){e.stopPropagation();const id=fav.dataset.fav;favorites.has(id)?favorites.delete(id):favorites.add(id);localStorage.setItem(FAV,JSON.stringify([...favorites]));render();return}const card=e.target.closest('[data-open]');if(card)openModal(card.dataset.open)});
-$('#searchInput').addEventListener('input',render);$('#sortSelect').addEventListener('change',render);
-$('#resetSearch').addEventListener('click',()=>{$('#searchInput').value='';activeFilter='Все';document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b.dataset.filter==='Все'));render()});
-$('#openCreate').addEventListener('click',()=>showModal('createModal'));
-document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
-document.querySelectorAll('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id)}));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-backdrop:not(.hidden)').forEach(m=>closeModal(m.id));if(e.key==='Enter'&&document.activeElement===$('#searchInput'))$('#catalog').scrollIntoView()});
-$('#copyDescription').addEventListener('click',async()=>{if(!activeItem)return;const text=[activeItem.description,'',...(activeItem.items||[]).map(x=>'• '+x)].join('\n');try{await navigator.clipboard.writeText(text);toast('ОПИСАНИЕ СКОПИРОВАНО')}catch{const t=document.createElement('textarea');t.value=text;document.body.append(t);t.select();document.execCommand('copy');t.remove();toast('ОПИСАНИЕ СКОПИРОВАНО')}});
-$('#deleteOutfit').addEventListener('click',()=>{if(!activeItem||!custom.some(x=>x.id===activeItem.id))return;custom=custom.filter(x=>x.id!==activeItem.id);favorites.delete(activeItem.id);save();localStorage.setItem(FAV,JSON.stringify([...favorites]));closeModal('detailModal');render();toast('ОБРАЗ УДАЛЁН')});
-$('#createForm').addEventListener('submit',e=>{e.preventDefault();const f=new FormData(e.currentTarget),id='u'+Date.now();const image=String(f.get('image')).trim();const item={id,title:String(f.get('title')).trim(),image,category:String(f.get('category')),description:String(f.get('description')).trim(),items:String(f.get('items')).split('\n').map(x=>x.trim()).filter(Boolean),tags:String(f.get('tags')).split(',').map(x=>x.trim().replace(/^#/,'')).filter(Boolean),date:Date.now()};custom.unshift(item);save();e.currentTarget.reset();closeModal('createModal');activeFilter='Все';document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b.dataset.filter==='Все'));$('#searchInput').value='';render();toast('ОБРАЗ ДОБАВЛЕН В АРХИВ');$('#catalog').scrollIntoView()});
-render();
+async function openCharacter(id){
+ const character=await getOne("characters",id);if(!character)return;
+ currentCharacterId=id;
+ $("#characterCode").textContent=id.slice(-6).toUpperCase();
+ $("#characterName").textContent=character.name;
+ $("#characterBio").textContent=character.bio||"Описание пока не добавлено.";
+ $("#characterTags").innerHTML=(character.tags||[]).map(t=>"<span>#"+esc(t)+"</span>").join("");
+ setBranchView();await renderPhotos();
+}
+async function renderPhotos(){
+ if(!currentCharacterId)return;
+ const allPhotos=(await getAll("photos")).filter(p=>p.characterId===currentCharacterId).sort((a,b)=>b.createdAt-a.createdAt);
+ $("#photoCount").textContent=String(allPhotos.length).padStart(2,"0")+" FILES";
+ $("#photoGrid").innerHTML=allPhotos.map((p,i)=>{const url=URL.createObjectURL(p.blob);return '<article class="photo-card" data-photo="'+esc(p.id)+'"><div class="photo-thumb"><img src="'+url+'" alt="'+esc(p.title||"Character photo")+'"><span class="photo-index">IMG / '+String(i+1).padStart(2,"0")+'</span><button class="photo-copy-small" data-copy-photo="'+esc(p.id)+'" type="button">▣ COPY</button></div><div class="photo-caption"><b>'+esc(p.title||"Untitled reference")+'</b><span>'+new Date(p.createdAt).toLocaleDateString("ru-RU")+'</span></div></article>'}).join("");
+ $("#photoEmpty").classList.toggle("hidden",allPhotos.length>0);
+ $("#photoGrid").classList.toggle("hidden",allPhotos.length===0);
+}
+async function openPhoto(id){
+ const photo=await getOne("photos",id);if(!photo)return;activePhoto=photo;
+ if(fullImageUrl)URL.revokeObjectURL(fullImageUrl);
+ fullImageUrl=URL.createObjectURL(photo.blob);
+ $("#fullImage").src=fullImageUrl;$("#fullImage").alt=photo.title||"Character photo";
+ $("#imageTitle").textContent=photo.title||"Untitled reference";$("#imageNote").textContent=photo.note||"";
+ $("#imageFileCode").textContent=photo.id.slice(-6).toUpperCase();
+ const ext=photo.blob.type==="image/png"?"png":"webp";
+ $("#downloadPhoto").href=fullImageUrl;$("#downloadPhoto").download=(photo.title||"ashqd-image").replace(/[^\w\-]+/g,"-")+"."+ext;
+ showModal("imageModal");
+}
+async function downloadBlob(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+async function copyPhoto(photo){
+ try{
+   let pngBlob;
+   if(photo.blob.type==="image/png")pngBlob=photo.blob;
+   else{const bitmap=await createImageBitmap(photo.blob);const canvas=document.createElement("canvas");canvas.width=bitmap.width;canvas.height=bitmap.height;canvas.getContext("2d").drawImage(bitmap,0,0);pngBlob=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));bitmap.close()}
+   if(!navigator.clipboard||!window.ClipboardItem)throw new Error("Clipboard API unavailable");
+   await navigator.clipboard.write([new ClipboardItem({"image/png":pngBlob})]);
+   toast("IMAGE COPIED TO CLIPBOARD ✧");
+ }catch(error){await downloadBlob(photo.blob,(photo.title||"ashqd-image")+".webp");toast("БРАУЗЕР НЕ РАЗРЕШИЛ КОПИРОВАНИЕ — ФОТО СКАЧАНО")}
+}
+$("#openCharacter").addEventListener("click",()=>showModal("characterModal"));
+$("#heroCreate").addEventListener("click",()=>showModal("characterModal"));
+$("#emptyCreate").addEventListener("click",()=>showModal("characterModal"));
+$("#brandHome").addEventListener("click",e=>{e.preventDefault();showHome()});
+$("#footerHome").addEventListener("click",e=>{e.preventDefault();showHome()});
+$("#navBranches").addEventListener("click",e=>{e.preventDefault();showHome();document.querySelector("#catalog").scrollIntoView({behavior:"smooth"})});
+$("#navAbout").addEventListener("click",e=>{e.preventDefault();if($("#homeView").classList.contains("hidden"))showHome();setTimeout(()=>$("#about").scrollIntoView({behavior:"smooth"}),20)});
+$("#searchInput").addEventListener("input",renderCharacters);
+$("#characterGrid").addEventListener("click",e=>{const card=e.target.closest("[data-character]");if(card)openCharacter(card.dataset.character)});
+$("#backToBranches").addEventListener("click",showHome);
+$("#addPhoto").addEventListener("click",()=>{clearPreview();$("#photoForm").reset();showModal("photoModal")});
+$("#emptyAddPhoto").addEventListener("click",()=>$("#addPhoto").click());
+$("#photoFile").addEventListener("change",e=>filePreview(e.target.files[0]));
+$("#clearPhoto").addEventListener("click",clearPreview);
+$("#uploadZone").addEventListener("dragover",e=>{e.preventDefault();e.currentTarget.classList.add("dragging")});
+$("#uploadZone").addEventListener("dragleave",e=>e.currentTarget.classList.remove("dragging"));
+$("#uploadZone").addEventListener("drop",e=>{e.preventDefault();e.currentTarget.classList.remove("dragging");const file=e.dataTransfer.files[0];if(file&&file.type.startsWith("image/")){const dt=new DataTransfer();dt.items.add(file);$("#photoFile").files=dt.files;filePreview(file)}});
+document.addEventListener("paste",e=>{if($("#photoModal").classList.contains("hidden"))return;const item=Array.from(e.clipboardData.items||[]).find(x=>x.type.startsWith("image/"));if(item){const file=item.getAsFile();const dt=new DataTransfer();dt.items.add(file);$("#photoFile").files=dt.files;filePreview(file);toast("IMAGE READY TO SAVE ✧")}});
+$("#characterForm").addEventListener("submit",async e=>{e.preventDefault();const data=new FormData(e.currentTarget);const character={id:makeId(),name:String(data.get("name")).trim(),bio:String(data.get("bio")).trim(),tags:String(data.get("tags")).split(",").map(x=>x.trim().replace(/^#/,"")).filter(Boolean),createdAt:Date.now()};await put("characters",character);e.currentTarget.reset();closeModal("characterModal");await renderCharacters();toast("CHARACTER BRANCH CREATED ✧");});
+$("#photoForm").addEventListener("submit",async e=>{e.preventDefault();if(!currentCharacterId)return;const file=$("#photoFile").files[0];if(!file){toast("СНАЧАЛА ВЫБЕРИ ИЗОБРАЖЕНИЕ");return}if(file.size>20*1024*1024){toast("ФАЙЛ СЛИШКОМ БОЛЬШОЙ (ЛИМИТ 20 МБ)");return}try{const data=new FormData(e.currentTarget);const blob=await compressImage(file);const photo={id:makeId(),characterId:currentCharacterId,title:String(data.get("title")).trim(),note:String(data.get("note")).trim(),blob,createdAt:Date.now()};await put("photos",photo);e.currentTarget.reset();closeModal("photoModal");await renderPhotos();toast("PHOTO ADDED TO CHARACTER FILE ✧")}catch(error){toast("НЕ УДАЛОСЬ СОХРАНИТЬ ФОТО") }});
+$("#photoGrid").addEventListener("click",async e=>{const copy=e.target.closest("[data-copy-photo]");if(copy){e.stopPropagation();const photo=await getOne("photos",copy.dataset.copyPhoto);if(photo)await copyPhoto(photo);return}const card=e.target.closest("[data-photo]");if(card)openPhoto(card.dataset.photo)});
+$("#copyPhoto").addEventListener("click",()=>{if(activePhoto)copyPhoto(activePhoto)});
+$("#deletePhoto").addEventListener("click",async()=>{if(!activePhoto)return;if(!confirm("Удалить это фото из ветки персонажа?"))return;await remove("photos",activePhoto.id);activePhoto=null;closeModal("imageModal");await renderPhotos();toast("PHOTO DELETED")});
+$("#deleteCharacter").addEventListener("click",async()=>{if(!currentCharacterId)return;if(!confirm("Удалить ветку персонажа и все фотографии внутри неё? Это действие нельзя отменить."))return;const photos=(await getAll("photos")).filter(p=>p.characterId===currentCharacterId);for(const photo of photos)await remove("photos",photo.id);await remove("characters",currentCharacterId);showHome();toast("CHARACTER BRANCH DELETED")});
+document.querySelectorAll("[data-close]").forEach(button=>button.addEventListener("click",()=>closeModal(button.dataset.close)));
+document.querySelectorAll(".modal-backdrop").forEach(modal=>modal.addEventListener("click",e=>{if(e.target===modal)closeModal(modal.id)}));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")document.querySelectorAll(".modal-backdrop:not(.hidden)").forEach(m=>closeModal(m.id))});
+(async()=>{try{db=await openDB();localStorage.removeItem("ashqd-outfits-v2");localStorage.removeItem("ashqd-favorites-v1");await renderCharacters()}catch(error){toast("БРАУЗЕР НЕ ПОДДЕРЖИВАЕТ ЛОКАЛЬНОЕ ХРАНИЛИЩЕ")}})();
