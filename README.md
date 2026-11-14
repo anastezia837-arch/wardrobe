@@ -1,18 +1,19 @@
-# ASHQD — Wardrobe Archive
+# ASHQD — Character Archive
 
-A responsive visual wardrobe archive for roleplay outfit references.
+A dark burgundy Y2K-inspired character and image archive for roleplay.
 
 ## Features
-- Responsive editorial-style interface
-- Search across names, descriptions, categories, tags and item lists
-- Category filters and sorting
-- Outfit detail modal with copy-to-clipboard description
-- Favorites
-- Add and delete custom outfit cards
-- Local browser storage for custom entries and favorites
+- Create separate character branches with a name, description and tags
+- Open each branch to manage its own image gallery
+- Upload images from files, drag & drop, or paste an image with Ctrl+V
+- Copy any saved photo to the clipboard (with automatic download fallback)
+- Download and delete photos; delete a character branch and its contents
+- Responsive layout with no preloaded or stock photographs
+
+## Storage
+Character records and uploaded image files are stored in the browser's IndexedDB. They are private to that browser and device, and are not synchronized to other devices or shared between users. Keep local backups of important references.
+
+Images are resized to a maximum 1800px on the longest side and stored as WebP to reduce local storage use.
 
 ## Deploy
-This is a static site. Enable **GitHub Pages** in repository Settings → Pages → Deploy from branch → `main` / `/(root)`.
-
-## Notes
-Custom outfits and favorites are stored in the visitor's browser using localStorage. They are not synchronized between devices. Images are loaded from the URLs supplied by the user or the sample Unsplash references.
+Enable **GitHub Pages** in repository Settings → Pages → Deploy from branch → \`main\` / \`/(root)\`.
