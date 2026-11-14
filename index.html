@@ -6,14 +6,14 @@
 <meta name="theme-color" content="#270811">
 <meta name="description" content="ASHQD — личный архив персонажей и визуальных референсов.">
 <title>ASHQD — character archive</title>
-<link rel="stylesheet" href="ashqd-y2k.css?v=2">
+<link rel="stylesheet" href="ashqd-y2k-v3.css?v=3">
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
 <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
 <header class="topbar">
   <a class="brand" href="#top" id="brandHome" aria-label="ASHQD home">ASHQD<span>✳</span></a>
-  <nav class="main-nav"><a href="#catalog" id="navBranches">CHARACTER BRANCHES</a><a href="#about" id="navAbout">ABOUT</a></nav>
+  <nav class="main-nav"><a href="#catalog" id="navBranches">CHARACTER BRANCHES</a><a href="#clothingCatalog" id="navClothing">CLOTHING REFS</a><a href="#about" id="navAbout">ABOUT</a></nav>
   <button class="top-action" id="openCharacter"><span>＋</span> NEW CHARACTER</button>
 </header>
 
@@ -53,6 +53,17 @@
         <button id="emptyCreate">＋ CREATE FIRST CHARACTER</button>
       </div>
     </section>
+
+    <section class="clothing-section" id="clothingCatalog">
+      <div class="clothing-section-head">
+        <div><p class="eyebrow">THE OUTFIT LIBRARY <span>✧</span></p><h2>Clothing <em>references.</em></h2><p class="clothing-intro">Отдельная коллекция одежды для любых персонажей и сцен. Добавляй фото и сохраняй готовые описания для RP.</p></div>
+        <button class="solid-button clothing-add" id="openClothingModal">＋ ADD CLOTHING REF</button>
+      </div>
+      <div class="clothing-toolbar"><div class="directory-count"><span id="clothingCount">00</span> CLOTHING FILES</div><label class="search clothing-search"><span>⌕</span><input id="clothingSearch" type="search" placeholder="Поиск по названию и описанию..." autocomplete="off"></label></div>
+      <div class="clothing-grid" id="clothingGrid"></div>
+      <div class="empty-state" id="clothingEmpty"><div class="empty-symbol">✧</div><h3>Your style archive starts here.</h3><p>Здесь пока нет референсов. Добавь первое фото одежды и сохрани описание, которое можно будет копировать в RP.</p><button id="emptyClothingCreate">＋ ADD FIRST REFERENCE</button></div>
+    </section>
+
     <section class="about" id="about">
       <div class="about-mark">A<span>✳</span></div>
       <div><p class="eyebrow">A LITTLE SPACE FOR YOUR LORE</p><h2>One character.<br><em>One universe.</em></h2></div>
@@ -109,7 +120,32 @@
     </div>
   </div>
 </div>
+
+<div class="modal-backdrop hidden" id="clothingModal" role="dialog" aria-modal="true" aria-labelledby="clothingModalTitle">
+  <form class="dialog-form" id="clothingForm">
+    <button type="button" class="close-modal" data-close="clothingModal" aria-label="Close">×</button>
+    <p class="eyebrow">NEW CLOTHING FILE</p><h2 id="clothingModalTitle">Add <em>reference.</em></h2>
+    <label>CLOTHING PHOTO<input id="clothingFile" name="photo" type="file" accept="image/*" required></label>
+    <div class="image-preview hidden" id="clothingPreview"><img id="clothingPreviewImage" alt="Предпросмотр одежды"><button type="button" id="clearClothingPhoto" class="clear-preview">REMOVE ×</button></div>
+    <label>REFERENCE TITLE<input name="title" required maxlength="80" placeholder="Например, dark academia coat"></label>
+    <label>RP DESCRIPTION<textarea name="description" required rows="6" maxlength="3000" placeholder="Опиши одежду подробно: силуэт, материал, цвет, посадку, детали, аксессуары и общее впечатление..."></textarea></label>
+    <label>TAGS <small>через запятую</small><input name="tags" placeholder="coat, gothic, winter, black"></label>
+    <button class="solid-button" type="submit">SAVE CLOTHING REF ↗</button>
+    <p class="form-note">Фото и описание сохраняются в отдельной коллекции Clothing refs.</p>
+  </form>
+</div>
+<div class="modal-backdrop hidden" id="clothingDetailModal" role="dialog" aria-modal="true" aria-labelledby="clothingDetailTitle">
+  <div class="image-dialog clothing-detail-dialog">
+    <button class="close-modal" data-close="clothingDetailModal" aria-label="Close">×</button>
+    <div class="image-dialog-media"><img id="clothingDetailImage" alt=""></div>
+    <div class="image-dialog-info"><p class="eyebrow">CLOTHING REFERENCE / <span id="clothingDetailCode">000</span></p><h2 id="clothingDetailTitle"></h2><div class="clothing-detail-tags" id="clothingDetailTags"></div><p id="clothingDetailDescription" class="clothing-detail-description"></p>
+      <div class="image-actions"><button class="solid-button" id="copyClothingDescription">▣ COPY DESCRIPTION</button><a class="outline-button download-link" id="downloadClothingImage" download="ashqd-clothing-ref.png">↓ DOWNLOAD PHOTO</a><button class="danger-button" id="deleteClothingRef">DELETE REFERENCE ×</button></div>
+      <p class="form-note">Описание копируется целиком, без тегов и служебных пометок.</p>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="ashqd-characters-v4.js?v=4"></script>
+<script src="ashqd-characters-v5.js?v=5"></script>
 </body>
 </html>
